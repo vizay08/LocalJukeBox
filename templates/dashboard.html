@@ -1,0 +1,86 @@
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Local JukeBox</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css'%}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-theme.min.css'%}">
+    <script type="text/javascript" src="{% static 'js/jquery-2.2.3.min.js' %}"></script>
+
+</head>
+<body>
+<nav  class="navbar  navbar-inverse">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">LocalJukeBox</a>
+    </div>
+
+
+
+  </div><!-- /.container-fluid -->
+</nav>
+<label style="text-align:center">Now Playing</label>
+<div id="playing_song" class="span2 well"></div><br>
+<label style="text-align:center">Playlist</label>
+<div id="playlist" class="span2 well"></div>
+<script>
+    function vote(token){
+        $.ajax({
+           url:'/vote/',
+           type: 'POST',
+           data : {'token':token}
+        });
+    };
+
+    $("#playing_song").ready(function(){
+
+        setInterval(function(){
+        $.ajax({
+
+            url: '/playingsong/',
+            type: 'POST',
+            success: function(r){
+                    $("#playing_song").html("<p>"+r+"</p>");
+                }
+        });
+        },1000);
+    });
+
+    $("#playlist").ready(function(){
+
+        setInterval(function(){
+        $.ajax({
+
+            url: '/playlist/',
+            type: 'POST',
+            success: function(r){
+
+                    r = JSON.parse(r);
+                    var s = "<ul>";
+                    for(i in r){
+                            console.log(i+"\n");
+
+                            s += "<li>"+r[i][0] +"<image class='bt' src=\"{% static 'images/plus.png' %}\" onClick=\"vote(\'"+r[i][1]+"')\"><i class='icon-plus-sign' ></i></image></li><br>";
+
+                    }
+                    s += "</ul>";
+                    $("#playlist").html(s);
+
+                }
+        });
+        },1000);
+    });
+</script>
+<script src="{% static  'bootstrap/js/bootstrap.min.js' %}"></script>
+</body>
+</html>
